@@ -10,11 +10,11 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 # ===== TOKEN =====
 TOKEN = os.getenv("TOKEN")
 
-# ===== LOG =====
+# ===== LOGGING =====
 logging.basicConfig(level=logging.INFO)
 
-# ===== FLASK SERVER (Render keep alive) =====
-app_web = Flask(name)
+# ===== FLASK SERVER =====
+app_web = Flask(name)  # ⚠️ MUST be name
 
 @app_web.route('/')
 def home():
@@ -59,8 +59,5 @@ def run_bot():
 if name == "main":
     import threading
 
-    # bot thread
     threading.Thread(target=run_bot).start()
-
-    # web server (Render needs this)
     app_web.run(host="0.0.0.0", port=10000)
