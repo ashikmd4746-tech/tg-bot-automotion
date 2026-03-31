@@ -2,8 +2,10 @@ import logging
 import qrcode
 from io import BytesIO
 import os
-from flask import Flask
+import threading
+import asyncio
 
+from flask import Flask
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
@@ -47,6 +49,9 @@ async def generate_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ===== BOT RUN =====
 def run_bot():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
@@ -57,7 +62,5 @@ def run_bot():
 
 # ===== RUN BOTH =====
 if __name__ == "__main__":
-    import threading
-
     threading.Thread(target=run_bot).start()
     app_web.run(host="0.0.0.0", port=10000)
