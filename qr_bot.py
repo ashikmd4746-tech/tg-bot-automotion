@@ -7,27 +7,29 @@ from flask import Flask
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
+# ===== TOKEN =====
 TOKEN = os.getenv("TOKEN")
 
+# ===== LOG =====
 logging.basicConfig(level=logging.INFO)
 
-# ====== Flask keep alive ======
+# ===== FLASK SERVER (Render keep alive) =====
 app_web = Flask(name)
 
 @app_web.route('/')
 def home():
     return "Bot is running!"
 
-# ====== Telegram Bot ======
+# ===== TELEGRAM BOT =====
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🤖 QR Bot\n\n"
-        "/qr <text> → Generate QR"
+        "🤖 QR Bot Live!\n\n"
+        "/qr <text> → Generate QR Code"
     )
 
 async def generate_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not context.args:
-        await update.message.reply_text("Use: /qr Hello")
+        await update.message.reply_text("⚠️ Use: /qr Hello")
         return
 
     text = " ".join(context.args)
@@ -38,19 +40,27 @@ async def generate_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     qr.save(bio, "PNG")
     bio.seek(0)
 
-    await update.message.reply_photo(photo=bio)
+    await update.message.reply_photo(
+        photo=bio,
+        caption=f"✅ QR Generated:\n{text}"
+    )
 
-def main():
-    bot = ApplicationBuilder().token(TOKEN).build()
+# ===== MAIN BOT =====
+def run_bot():
+    app = ApplicationBuilder().token(TOKEN).build()
 
-    bot.add_handler(CommandHandler("start", start))
-    bot.add_handler(CommandHandler("qr", generate_qr))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("qr", generate_qr))
 
-    print("Bot Running...")
-    bot.run_polling()
+    print("🚀 Bot Running...")
+    app.run_polling()
 
-# ====== Run both ======
+# ===== RUN BOTH =====
 if name == "main":
     import threading
-    threading.Thread(target=main).start()
+
+    # bot thread
+    threading.Thread(target=run_bot).start()
+
+    # web server (Render needs this)
     app_web.run(host="0.0.0.0", port=10000)
