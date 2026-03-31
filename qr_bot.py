@@ -14,7 +14,7 @@ TOKEN = os.getenv("TOKEN")
 logging.basicConfig(level=logging.INFO)
 
 # ===== FLASK SERVER =====
-app_web = Flask(name)   # ✅ MUST BE name
+app_web = Flask(__name__)
 
 @app_web.route('/')
 def home():
@@ -56,7 +56,7 @@ def run_bot():
     app.run_polling()
 
 # ===== RUN BOTH =====
-if name == "main":   # ✅ MUST BE name AND "main"
+if __name__ == "__main__":
     import threading
 
     threading.Thread(target=run_bot).start()
