@@ -14,7 +14,7 @@ TOKEN = os.getenv("TOKEN")
 logging.basicConfig(level=logging.INFO)
 
 # ===== FLASK SERVER =====
-app_web = Flask(name)   # ✅ FIXED
+app_web = Flask(name)   # ✅ MUST BE name
 
 @app_web.route('/')
 def home():
@@ -45,7 +45,7 @@ async def generate_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
         caption=f"✅ QR Generated:\n{text}"
     )
 
-# ===== MAIN BOT =====
+# ===== BOT RUN =====
 def run_bot():
     app = ApplicationBuilder().token(TOKEN).build()
 
@@ -56,7 +56,7 @@ def run_bot():
     app.run_polling()
 
 # ===== RUN BOTH =====
-if name == "main":   # ✅ FIXED
+if name == "main":   # ✅ MUST BE name AND "main"
     import threading
 
     threading.Thread(target=run_bot).start()
