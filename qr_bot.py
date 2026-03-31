@@ -2,6 +2,7 @@ import logging
 import qrcode
 from io import BytesIO
 import os
+from flask import Flask
 
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
@@ -10,6 +11,14 @@ TOKEN = os.getenv("TOKEN")
 
 logging.basicConfig(level=logging.INFO)
 
+# ====== Flask keep alive ======
+app_web = Flask(name)
+
+@app_web.route('/')
+def home():
+    return "Bot is running!"
+
+# ====== Telegram Bot ======
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🤖 QR Bot\n\n"
@@ -32,13 +41,16 @@ async def generate_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_photo(photo=bio)
 
 def main():
-    app = ApplicationBuilder().token(TOKEN).build()
+    bot = ApplicationBuilder().token(TOKEN).build()
 
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("qr", generate_qr))
+    bot.add_handler(CommandHandler("start", start))
+    bot.add_handler(CommandHandler("qr", generate_qr))
 
     print("Bot Running...")
-    app.run_polling()
+    bot.run_polling()
 
+# ====== Run both ======
 if name == "main":
-    main()
+    import threading
+    threading.Thread(target=main).start()
+    app_web.run(host="0.0.0.0", port=10000)
