@@ -58,7 +58,10 @@ def run_bot():
     app.add_handler(CommandHandler("qr", generate_qr))
 
     print("🚀 Bot Running...")
-    app.run_polling()
+
+    app.run_polling(
+        stop_signals=None
+    )
 
 # ===== RUN BOTH =====
 if __name__ == "__main__":
